@@ -1,0 +1,167 @@
+# ------------------------------------------------------------
+# OS / Filesystem noise
+# ------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Spotlight-V100/
+.Trashes/
+._*
+
+# ------------------------------------------------------------
+# Editor / IDE
+# ------------------------------------------------------------
+.idea/
+.fleet/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Keep workspace settings if needed, but ignore local VS Code state
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# ------------------------------------------------------------
+# Logs / temp / cache
+# ------------------------------------------------------------
+logs/
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.tmp
+*.temp
+tmp/
+temp/
+.cache/
+.eslintcache
+.stylelintcache
+.rpt2_cache/
+.swc/
+
+# ------------------------------------------------------------
+# Environment / secrets / local config
+# ------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.sample
+*.local
+*.secret
+*.secrets
+secrets/
+
+# ------------------------------------------------------------
+# Node / JS / TS
+# ------------------------------------------------------------
+node_modules/
+jspm_packages/
+.npm/
+.pnpm-store/
+.yarn/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Build output
+dist/
+build/
+lib/
+out/
+coverage/
+*.tsbuildinfo
+
+# Package manager lockfiles can be committed intentionally.
+# Do not ignore package-lock.json / pnpm-lock.yaml / yarn.lock.
+
+# ------------------------------------------------------------
+# VS Code extension artifacts
+# ------------------------------------------------------------
+.vscode-test/
+.vscode-test-web/
+.vsix
+*.vsix
+extension-web/
+web-dist/
+
+# ------------------------------------------------------------
+# Test artifacts
+# ------------------------------------------------------------
+test-results/
+playwright-report/
+blob-report/
+.nyc_output/
+junit.xml
+reports/
+
+# ------------------------------------------------------------
+# Runtime data / pid
+# ------------------------------------------------------------
+pids/
+*.pid
+*.pid.lock
+*.seed
+
+# ------------------------------------------------------------
+# Python (tooling/scripts)
+# ------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.pyre/
+.tox/
+.nox/
+.hypothesis/
+.venv/
+venv/
+env/
+ENV/
+pip-wheel-metadata/
+
+# ------------------------------------------------------------
+# Go / Rust / Java (possible tooling sidecars)
+# ------------------------------------------------------------
+bin/
+target/
+Cargo.lock
+*.class
+.gradle/
+
+# ------------------------------------------------------------
+# Databases / local state files
+# ------------------------------------------------------------
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# ------------------------------------------------------------
+# Archives / packaged artifacts
+# ------------------------------------------------------------
+*.7z
+*.gz
+*.zip
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.rar
