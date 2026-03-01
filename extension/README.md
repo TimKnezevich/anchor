@@ -3,9 +3,7 @@
 VS Code extension workflow layer for Axis.
 
 ## Commands
-- `axis.startTask`
-- `axis.confirmTask`
-- `axis.showTaskState`
+- `axis.initializeRepository`
 - `axis.openGraphExplorer`
 - `axis.checkConnection`
 
@@ -14,5 +12,12 @@ VS Code extension workflow layer for Axis.
 - Uses `WorkflowController` for command flow orchestration.
 - Uses `GraphExplorerController` for graph model, filters, trace path, and refresh.
 - Uses VS Code activation bridge in `src/vscode-extension.mjs`.
-- `confirmTask` enforces the full 6-step orchestrator loop.
+- Opens Graph Explorer in the external browser at `/graph-explorer`.
+- Adds Axis sidebar view container in the VS Code activity bar.
+- Attempts local runtime auto-start when an Axis-initialized workspace is opened.
 - Conflict and retry messages are normalized for lock and ETag errors.
+
+## Monitor-First Flow
+1. `axis.initializeRepository`
+2. `axis.checkConnection`
+3. `axis.openGraphExplorer`

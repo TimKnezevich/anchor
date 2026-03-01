@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { renderGraphExplorerPage } from "./graph-explorer-page.mjs";
 
 export function createMcpHttpServer(options = {}) {
   const service = options.service;
@@ -9,6 +10,7 @@ export function createMcpHttpServer(options = {}) {
   const healthPath = options.healthPath ?? "/health";
   const livePath = options.livePath ?? "/health/live";
   const readyPath = options.readyPath ?? "/health/ready";
+  const graphExplorerPath = options.graphExplorerPath ?? "/graph-explorer";
   const runtimeProfile = options.runtimeProfile ?? "local";
   const storageAdapter = options.storageAdapter ?? "memory";
   const sidecars = options.sidecars ?? { vectorEnabled: false, eventEnabled: false };
@@ -22,6 +24,8 @@ export function createMcpHttpServer(options = {}) {
     const requestStart = Date.now();
     const correlationId = req.headers["x-correlation-id"] ?? null;
     const requestPath = req.url ?? "/";
+    const requestUrl = new URL(requestPath, "http://axis.local");
+    const routePath = requestUrl.pathname;
     const requestMethod = req.method ?? "UNKNOWN";
 
     function writeJson(status, payload) {
@@ -30,13 +34,14 @@ export function createMcpHttpServer(options = {}) {
       logger?.info("MCP HTTP request complete", {
         method: requestMethod,
         path: requestPath,
+        route_path: routePath,
         status,
         correlation_id: correlationId,
         duration_ms: Date.now() - requestStart
       });
     }
 
-    if (requestMethod === "GET" && requestPath === healthPath) {
+    if (requestMethod === "GET" && routePath === healthPath) {
       writeJson(200, {
         ok: true,
         service: "axis-mcp-http",
@@ -50,7 +55,7 @@ export function createMcpHttpServer(options = {}) {
       return;
     }
 
-    if (requestMethod === "GET" && requestPath === livePath) {
+    if (requestMethod === "GET" && routePath === livePath) {
       writeJson(200, {
         ok: true,
         live: true,
@@ -60,7 +65,7 @@ export function createMcpHttpServer(options = {}) {
       return;
     }
 
-    if (requestMethod === "GET" && requestPath === readyPath) {
+    if (requestMethod === "GET" && routePath === readyPath) {
       writeJson(200, {
         ok: true,
         ready: true,
@@ -74,7 +79,25 @@ export function createMcpHttpServer(options = {}) {
       return;
     }
 
-    if (requestMethod === "POST" && requestPath === mcpPath) {
+    if (requestMethod === "GET" && routePath === graphExplorerPath) {
+      const html = renderGraphExplorerPage({
+        mcpPath,
+        title: "Axis Graph Explorer"
+      });
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      res.end(html);
+      logger?.info("MCP HTTP request complete", {
+        method: requestMethod,
+        path: requestPath,
+        route_path: routePath,
+        status: 200,
+        correlation_id: correlationId,
+        duration_ms: Date.now() - requestStart
+      });
+      return;
+    }
+
+    if (requestMethod === "POST" && routePath === mcpPath) {
       let body = "";
       req.on("data", (chunk) => {
         body += chunk;
@@ -114,7 +137,8 @@ export function createMcpHttpServer(options = {}) {
         message: "Route not found.",
         details: {
           method: requestMethod,
-          path: requestPath
+          path: requestPath,
+          route_path: routePath
         },
         correlationId
       }
@@ -160,6 +184,7 @@ export function createMcpHttpServer(options = {}) {
         health_path: healthPath,
         live_path: livePath,
         ready_path: readyPath,
+        graph_explorer_path: graphExplorerPath,
         profile: runtimeProfile
       });
 
@@ -170,6 +195,7 @@ export function createMcpHttpServer(options = {}) {
         healthPath,
         livePath,
         readyPath,
+        graphExplorerPath,
         profile: runtimeProfile
       };
     },

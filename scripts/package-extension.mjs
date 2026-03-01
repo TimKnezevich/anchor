@@ -3,6 +3,7 @@ import { existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createLogger } from "../shared/observability/src/index.mjs";
+import { ensureIconAssets } from "./ensure-icon-assets.mjs";
 
 const logger = createLogger({ service: "axis-extension-package" });
 
@@ -11,6 +12,7 @@ const extensionDir = join(here, "..", "extension");
 const distDir = join(here, "..", "dist");
 const vsceBinary = join(extensionDir, "node_modules", ".bin", "vsce");
 
+ensureIconAssets({ rootDir: join(here, "..") });
 mkdirSync(distDir, { recursive: true });
 
 if (!existsSync(vsceBinary)) {

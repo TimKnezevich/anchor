@@ -223,3 +223,38 @@ Response data:
   }
 }
 ```
+
+## initialize_workspace
+Request payload:
+```json
+{
+  "schema_version": "1"
+}
+```
+
+Response data:
+```json
+{
+  "repo_id": "repo-1",
+  "created": true,
+  "initialization": {
+    "status": "initialized",
+    "initialized": true,
+    "schema_version": "1",
+    "initialized_at": "2026-03-01T20:00:00Z",
+    "initialized_by": "dev-or-agent-id",
+    "artifact_paths": [
+      ".axis/",
+      ".axis/policy.json",
+      ".axis/evidence/",
+      ".axis/acknowledgments/",
+      "axis.json"
+    ]
+  }
+}
+```
+
+Behavior:
+- Initializes repository metadata for Axis bootstrap if not already initialized.
+- Subsequent calls return the existing initialization with `created: false`.
+- Unknown payload fields return `VALIDATION_ERROR`.

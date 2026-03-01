@@ -38,6 +38,7 @@
 - `GET /health`: runtime summary and configured paths.
 - `GET /health/live`: process liveness.
 - `GET /health/ready`: service readiness with storage/sidecar state.
+- `GET /graph-explorer`: browser Graph Explorer UI backed by MCP read-state calls.
 
 ## Operational Logging Standard
 All runtime logs are structured JSON with:

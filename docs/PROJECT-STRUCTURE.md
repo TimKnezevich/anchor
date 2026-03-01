@@ -20,3 +20,5 @@
 - `shared/observability/src/logger.mjs`: Structured logger.
 - `shared/observability/src/error-log-mapper.mjs`: Error severity mapping and safe serialization.
 - `shared/observability/src/redaction.mjs`: Sensitive field redaction.
+- `shared/policy/src/policy-validator.mjs`: Axis policy schema defaults and validation.
+- `shared/policy/src/evidence-ack-validator.mjs`: Enforcement evidence/acknowledgment schema validation.

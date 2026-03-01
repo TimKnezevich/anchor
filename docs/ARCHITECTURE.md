@@ -82,6 +82,19 @@ Extension behavior:
 - All write commands include actor identity + `command_id`.
 - Axis server logs invariant failures as structured events.
 
+## Enforcement and Initialization References
+- Workspace initialization command: `initialize_workspace` (MCP).
+- Extension one-click action: `Axis: Initialize Repository`.
+- Drift enforcement scripts:
+  - `scripts/axis-validate-diff.mjs`
+  - `scripts/axis-acknowledge.mjs`
+  - `scripts/axis-rollback-unlinked.mjs`
+- Operations docs:
+  - `docs/CI-ENFORCEMENT.md`
+  - `docs/ENFORCEMENT-RUNBOOK.md`
+  - `docs/POLICY-SCHEMA.md`
+  - `docs/ENFORCEMENT-RECORD-SCHEMA.md`
+
 ## MVP Exit Criteria
 1. Extension can run tasks through full 6-step loop.
 2. Graph Explorer reflects live node status.

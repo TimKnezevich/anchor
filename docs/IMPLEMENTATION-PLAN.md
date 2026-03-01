@@ -208,6 +208,34 @@ Deliverables:
 - source SVG logo + exported icon set for extension/publishing surfaces
 - TODO tracker: `docs/todos/phase-16-publish-and-release-automation.md`
 
+## Phase 17: AI Enforcement, Repo Initialization, and Install UX (Week 9+)
+1. Add explicit repo initialization flow from VS Code:
+   - one-click `Axis: Initialize Repository` action in Axis sidebar/plugin window
+   - generate required Axis root files and folders (`.axis/`, `axis.json`, bootstrap state artifacts)
+   - validate and report initialization status in UI
+2. Implement full write-governance enforcement for AI-driven edits:
+   - detect diffs not tied to active Axis task/session evidence
+   - support warning + acknowledge/ignore + rollback workflow with audit records
+   - enforce in local hooks and CI so bypassing local checks still fails upstream
+3. Add policy and evidence model for enforcement:
+   - repository-level policy file schema for enforcement mode and acknowledgement TTL
+   - acknowledgment ledger and evidence linkage format under `.axis/`
+   - deterministic validation errors and remediation output
+4. Align extension install/visual identity with Axis brand:
+   - ensure install-time icon and extension surfaces use the generated Axis icon set
+   - add install verification checks so icon parity regressions fail tests
+5. Replace end-user task-driving UX with monitor-first UX:
+   - prioritize check connection, initialization status, and graph monitoring controls
+   - de-emphasize or remove manual task workflow commands from primary user surface
+
+Deliverables:
+- one-click repo initialization in VS Code sidebar with generated Axis root artifacts
+- full diff-to-axis enforcement path with acknowledge/ignore/rollback and audit trail
+- policy/evidence schemas and validators for enforcement metadata
+- hook + CI automation that blocks unlinked or unacknowledged drift
+- install icon parity checks tied to Axis brand assets
+- TODO tracker: `docs/todos/phase-17-ai-enforcement-and-init.md`
+
 ## Test Matrix (Must Pass Before v0 Release)
 1. Single writer lock is exclusive per repo.
 2. One active session per task enforced.

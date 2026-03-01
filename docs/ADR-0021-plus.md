@@ -305,3 +305,432 @@ Historical entries `ADR-0001` through `ADR-0020` are in `docs/ADR.md`.
   - `docs/RELEASE-VERIFICATION.md`
   - `docs/RELEASE-ROLLBACK.md`
   - `docs/todos/phase-16-publish-and-release-automation.md`
+
+## ADR-0035: Shift Graph Explorer to Browser UI, Add Axis Sidebar, and Auto-Start Runtime for Axis Repos
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Existing graph explorer opened inside an editor webview and required manual runtime startup.
+  - Product direction calls for a more visible Axis presence in VS Code and a more user-friendly browser-based graph view.
+- Decision:
+  - Serve Graph Explorer UI from MCP server at `/graph-explorer`.
+  - Change `axis.openGraphExplorer` to open the external browser URL instead of in-editor webview.
+  - Add an Axis activity bar container/view with key actions.
+  - Add best-effort runtime auto-start when opening an Axis-initialized workspace.
+  - Surface check-connection feedback as VS Code notifications.
+- Consequences:
+  - Graph exploration is decoupled from editor tab space and can evolve as a richer web UI.
+  - Axis is always visible in activity bar for discoverability.
+  - Runtime startup friction is reduced for Axis repos; failures still require operator action.
+- Related:
+  - `server/mcp/src/graph-explorer-page.mjs`
+  - `server/mcp/src/http-server.mjs`
+  - `extension/src/vscode-extension.js`
+  - `extension/src/vscode-extension.mjs`
+  - `extension/src/axis-sidebar-provider.mjs`
+  - `extension/src/runtime-autostart.mjs`
+  - `extension/src/graph-browser-command.mjs`
+  - `extension/src/connection-command.mjs`
+
+## ADR-0036: Match HTTP Routes by URL Pathname to Support Query Strings
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Browser Graph Explorer opens `/graph-explorer` with query parameters (for example `repo_id`).
+  - HTTP server route checks compared the raw `req.url` string, so query strings caused false `NOT_FOUND` responses.
+- Decision:
+  - Parse incoming request URL and match server routes using `pathname`.
+  - Keep raw request path in logs and error details, and include normalized route path for debugging.
+- Consequences:
+  - `/graph-explorer?repo_id=...` resolves to the Graph Explorer page instead of returning 404.
+  - Route behavior is consistent for all endpoints when optional query parameters are present.
+- Related:
+  - `server/mcp/src/http-server.mjs`
+  - `tests/mcp/http-server.test.mjs`
+
+## ADR-0037: Add Dedicated Phase for AI Edit Enforcement, One-Click Repo Init, and Install Icon Parity
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Current workflow and invariants do not yet provide full automation for detecting and governing code diffs not linked to Axis task/session evidence.
+  - Repo onboarding lacks an explicit one-click initialization flow from the VS Code plugin window.
+  - Installation and extension UI icon parity must be verified against generated Axis brand assets.
+- Decision:
+  - Add Phase 17 to deliver full AI edit-governance automation, including warning/acknowledge-ignore/rollback controls, hook+CI enforcement, and auditability.
+  - Add a one-click `Axis: Initialize Repository` flow that creates required Axis root artifacts in the repo.
+  - Add explicit install icon parity tasks and tests so install surfaces remain aligned to generated Axis icon assets.
+- Consequences:
+  - Enforcement work is tracked as a first-class phase with a dedicated TODO file and test scope.
+  - End-user onboarding becomes explicit and repeatable instead of relying on marker-file inference.
+  - Release/install UX gains deterministic icon consistency checks.
+- Related:
+  - `docs/IMPLEMENTATION-PLAN.md`
+  - `docs/todos/phase-17-ai-enforcement-and-init.md`
+  - `extension/src/axis-sidebar-provider.mjs`
+  - `docs/EXTENSION-INSTALL.md`
+  - `docs/ICON-SPEC.md`
+
+## ADR-0038: Define Axis Policy Schema with Defaults and Deterministic Validation
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 enforcement work needs a single repo-level policy source for actor scope, enforcement mode, and acknowledgment TTL.
+  - Validation must be deterministic so hook, CLI, and CI checks can produce the same failures.
+- Decision:
+  - Define `.axis/policy.json` schema with fields:
+    - `schema_version`
+    - `enforcement_mode` (`warn` | `enforce`)
+    - `actor_scope` (`any` | `allowlist`)
+    - `allowed_actors`
+    - `acknowledgment_ttl_minutes`
+  - Provide shared defaults and a shared validator in `shared/policy`.
+  - Reject unknown fields and invalid enum/value combinations.
+- Consequences:
+  - Enforcement components can normalize policy consistently before evaluation.
+  - Validation failures become reproducible across local and CI execution paths.
+- Related:
+  - `shared/policy/src/policy-validator.mjs`
+  - `tests/policy/axis-policy-schema.test.mjs`
+  - `docs/POLICY-SCHEMA.md`
+
+## ADR-0039: Define Enforcement Evidence and Acknowledgment Record Schemas Under .axis
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 enforcement needs structured metadata for linking diffs to task/session evidence and for storing approved temporary exceptions.
+  - Local hooks and CI checks need deterministic parsing and validation for these records.
+- Decision:
+  - Define evidence link records under `.axis/evidence/*.json` with required linkage fields:
+    `task_id`, `work_session_id`, `actor`, `files`, plus identity/timestamp fields.
+  - Define acknowledgment records under `.axis/acknowledgments/*.json` with required approval fields:
+    `reason`, `approved_by`, `expires_at`, and linkage fields.
+  - Implement shared validators that reject unknown fields and enforce timestamp ordering/unique file lists.
+- Consequences:
+  - Enforcement automation can use one validator path for CLI, hook, and CI behavior.
+  - Acknowledgment expiry behavior is deterministic and auditable.
+- Related:
+  - `shared/policy/src/evidence-ack-validator.mjs`
+  - `tests/policy/axis-evidence-ack-schema.test.mjs`
+  - `docs/ENFORCEMENT-RECORD-SCHEMA.md`
+
+## ADR-0040: Add initialize_workspace MCP Command for Deterministic Repo Bootstrap State
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 requires an explicit, one-step initialization path that can be invoked from extension UX.
+  - Initialization status must be queryable and idempotent for repeated command execution.
+- Decision:
+  - Add MCP command `initialize_workspace`.
+  - Command stores repo initialization status and returns deterministic artifact paths for bootstrap outputs.
+  - Command is idempotent under `command_id` replay and returns existing initialization with `created: false` for subsequent non-replay calls.
+  - Unknown payload fields are rejected with `VALIDATION_ERROR`.
+- Consequences:
+  - Extension-side one-click initialize can depend on a stable API contract.
+  - Repeated initialization attempts remain safe and predictable.
+- Related:
+  - `server/mcp/src/request-validator.mjs`
+  - `server/mcp/src/mcp-service.mjs`
+  - `server/mcp/src/in-memory-store.mjs`
+  - `tests/mcp/initialize-workspace-command.test.mjs`
+  - `docs/API-CONTRACT.md`
+
+## ADR-0041: Add One-Click Initialize Repository Command in Extension Sidebar with Guided Notifications
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 requires one-click repo initialization from the plugin window.
+  - Initialization responses should guide operators to the next action after success or failure.
+- Decision:
+  - Add extension command `axis.initializeRepository` and include it in command contributions and activation events.
+  - Add sidebar entry "Initialize Repository" as a one-click action.
+  - Implement a dedicated VS Code command adapter that shows actionable notifications on success/failure.
+- Consequences:
+  - Initialization is directly discoverable in the Axis sidebar.
+  - Operators receive deterministic success/failure guidance without reading logs.
+- Related:
+  - `extension/src/initialize-repository-command.mjs`
+  - `extension/src/axis-sidebar-provider.mjs`
+  - `extension/src/vscode-extension.mjs`
+  - `extension/package.json`
+  - `tests/extension/initialize-repository-command.test.mjs`
+
+## ADR-0042: Add Initialization Status Resolver and Sidebar Status Row
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 requires initialization status visibility in the plugin window.
+  - Operators need deterministic status messaging for initialized, uninitialized, and runtime-unreachable states.
+- Decision:
+  - Add initialization status resolver that checks workspace Axis markers and runtime health.
+  - Add top-row status item in Axis sidebar with refresh support.
+  - Run status resolution during extension activation and log the resolved state.
+  - Allow initialize command flow to refresh sidebar status on success/failure.
+- Consequences:
+  - Initialization state becomes visible without manual command execution.
+  - Startup path surfaces runtime-connectivity issues earlier.
+- Related:
+  - `extension/src/initialization-status-provider.mjs`
+  - `extension/src/axis-sidebar-provider.mjs`
+  - `extension/src/vscode-extension.mjs`
+  - `tests/extension/initialization-status-provider.test.mjs`
+
+## ADR-0043: Add axis-validate-diff Script with Deterministic pass/warn/fail Exit Codes
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 requires automated detection of changed files that are not linked to active Axis evidence metadata.
+  - Local hooks and CI require deterministic machine-readable outcomes.
+- Decision:
+  - Add `scripts/axis-validate-diff.mjs` to collect staged/working changed files via git diff.
+  - Validate `.axis/policy.json` and latest/selected evidence link record from `.axis/evidence`.
+  - Emit deterministic statuses and exit codes:
+    - `pass` -> `0`
+    - `warn` -> `10`
+    - `fail` -> `20`
+- Consequences:
+  - Enforcement behavior is scriptable and can be reused by hooks and CI.
+  - Missing/invalid policy or evidence metadata deterministically fails validation.
+- Related:
+  - `scripts/axis-validate-diff.mjs`
+  - `tests/scripts/axis-validate-diff.test.mjs`
+  - `docs/todos/phase-17-ai-enforcement-and-init.md`
+
+## ADR-0044: Add Acknowledgment CLI and Expiry-Aware Diff Validation
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Enforcement flow needs an explicit way to acknowledge temporary unlinked drift with reason and expiry.
+  - Diff validation must distinguish active acknowledgments from expired records.
+- Decision:
+  - Add acknowledgment utility module and CLI:
+    - `scripts/axis-acknowledgment-lib.mjs`
+    - `scripts/axis-acknowledge.mjs`
+  - Add acknowledgment record creation with policy-derived TTL defaults.
+  - Extend `axis-validate-diff` to account for active acknowledgments and ignore expired acknowledgments.
+- Consequences:
+  - Teams can allow time-bound, auditable exceptions without disabling enforcement globally.
+  - Drift checks remain strict after acknowledgment expiration.
+- Related:
+  - `scripts/axis-acknowledgment-lib.mjs`
+  - `scripts/axis-acknowledge.mjs`
+  - `scripts/axis-validate-diff.mjs`
+  - `tests/scripts/axis-acknowledgment-flow.test.mjs`
+
+## ADR-0045: Add Unlinked Drift Rollback Script with Preview and Apply Modes
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 requires a rollback option for unlinked diffs after warning/validation failures.
+  - Operators need a non-destructive preview before applying rollback.
+- Decision:
+  - Add `scripts/axis-rollback-unlinked.mjs` with:
+    - preview mode (default) listing rollback candidates
+    - apply mode (`--apply`) using `git restore --staged --worktree` for unlinked files
+  - Reuse `axis-validate-diff` evaluation to determine rollback candidate files.
+- Consequences:
+  - Teams can quickly recover from drift while preserving a reviewable preview-first workflow.
+  - Rollback behavior stays deterministic and scriptable for future command wrappers.
+- Related:
+  - `scripts/axis-rollback-unlinked.mjs`
+  - `scripts/axis-validate-diff.mjs`
+  - `tests/scripts/axis-rollback-unlinked.test.mjs`
+
+## ADR-0046: Add Local Git Hook Enforcement and Installer for Diff + Commit Metadata Checks
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 requires local enforcement of unlinked diff detection and commit metadata linkage.
+  - Hook setup should be scriptable and repeatable per clone.
+- Decision:
+  - Add `.githooks/pre-commit` to run `axis-validate-diff` in staged mode.
+  - Add `.githooks/commit-msg` to enforce `axis_task` and `axis_session` metadata via a validator script.
+  - Add `scripts/install-git-hooks.mjs` to configure `core.hooksPath` to `.githooks`.
+- Consequences:
+  - Local commits are validated against Axis drift and linkage metadata by default once hooks are installed.
+  - Hook setup is deterministic and can be re-applied automatically in bootstrap scripts.
+- Related:
+  - `.githooks/pre-commit`
+  - `.githooks/commit-msg`
+  - `scripts/axis-validate-commit-msg.mjs`
+  - `scripts/install-git-hooks.mjs`
+  - `tests/scripts/git-hooks-enforcement.test.mjs`
+
+## ADR-0047: Add CI Enforcement Gate with Drift Report Artifact and Branch Protection Guidance
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Local hooks can be bypassed, so enforcement needs an upstream CI gate.
+  - CI failures need a machine-readable artifact to support remediation.
+- Decision:
+  - Add CI workflow steps to run `axis-validate-diff` in strict mode against `origin/main...HEAD`.
+  - Upload a JSON enforcement report artifact for both pass/fail runs.
+  - Add explicit branch/PR gate documentation for required CI status checks.
+- Consequences:
+  - Unlinked or expired-ack drift cannot merge if CI gating is configured as required.
+  - Operators can inspect the uploaded enforcement report to identify failing files/issues.
+- Related:
+  - `.github/workflows/ci.yml`
+  - `scripts/axis-validate-diff.mjs`
+  - `docs/CI-ENFORCEMENT.md`
+  - `tests/scripts/ci-enforcement-workflow.test.mjs`
+
+## ADR-0048: Standardize Enforcement Error Codes and Shared Guidance Mapper
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Enforcement tooling now spans CLI and extension surfaces.
+  - User guidance must stay consistent across these surfaces for the same failure codes.
+- Decision:
+  - Define deterministic enforcement error codes in a shared observability mapper.
+  - Provide code-to-guidance mapping with stable status classifications.
+  - Use shared mapper in both:
+    - CLI (`axis-validate-diff`)
+    - extension conflict/user messaging fallback
+- Consequences:
+  - Operators receive consistent remediation text regardless of interface.
+  - New enforcement failure classes can be added in one shared location.
+- Related:
+  - `shared/observability/src/enforcement-message-mapper.mjs`
+  - `scripts/axis-validate-diff.mjs`
+  - `extension/src/conflict-messages.mjs`
+  - `tests/observability/enforcement-error-mapper.test.mjs`
+  - `docs/ENFORCEMENT-ERRORS.md`
+
+## ADR-0049: Add Structured Enforcement Audit Log Across Diff/Ack/Rollback Flows
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Enforcement actions require auditability for operations and post-incident review.
+  - Events need consistent correlation fields to connect validation, acknowledgments, and rollback actions.
+- Decision:
+  - Add shared audit log writer/reader targeting `.axis/audit.log`.
+  - Emit structured events from:
+    - diff validation (`diff_validation`)
+    - acknowledgment creation (`acknowledgment_created`)
+    - rollback preview/apply (`rollback_preview`, `rollback_applied`)
+  - Include correlation fields in each event:
+    - `repo_id`, `task_id`, `work_session_id`, `actor`
+- Consequences:
+  - Enforcement lifecycle actions are traceable from a single local audit stream.
+  - Future UI/reporting features can read audit records without custom parsers per command.
+- Related:
+  - `shared/observability/src/enforcement-audit-log.mjs`
+  - `scripts/axis-validate-diff.mjs`
+  - `scripts/axis-acknowledgment-lib.mjs`
+  - `scripts/axis-rollback-unlinked.mjs`
+  - `tests/observability/enforcement-audit-log.test.mjs`
+
+## ADR-0050: Enforce Icon Asset Wiring and Add Fallback Generation Gate for Packaging/Release
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 requires extension install and sidebar icon paths to remain aligned with generated brand assets.
+  - Packaging/release must not fail silently when icon files are missing.
+- Decision:
+  - Add icon asset guard script `scripts/ensure-icon-assets.mjs` that regenerates icons when missing.
+  - Run icon asset guard in extension packaging and release dry-run flows.
+  - Add tests for:
+    - manifest/activity icon path wiring
+    - package media inclusion
+    - release dry-run icon parity gate presence
+- Consequences:
+  - Icon regressions are caught before extension/package artifacts are produced.
+  - Missing icon files are recovered automatically in local packaging path.
+- Related:
+  - `scripts/ensure-icon-assets.mjs`
+  - `scripts/package-extension.mjs`
+  - `scripts/release-dry-run.mjs`
+  - `tests/extension/icon-asset-wiring.test.mjs`
+  - `tests/scripts/icon-parity-release.test.mjs`
+
+## ADR-0051: Shift Extension Command Surface to Monitor-First Ordering
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 targets monitor-first user experience where initialize/check/graph actions are primary.
+  - Manual task-driving commands should remain available but not foregrounded in sidebar UX.
+- Decision:
+  - Reorder command contributions in extension manifest to prioritize:
+    - initialize repository
+    - check connection
+    - open graph explorer
+    - show task state
+  - Move manual task-driving commands to advanced trailing positions.
+  - Remove `startTask` from sidebar shortcuts and replace with `showTaskState`.
+  - Update initialize command guidance text and extension README flow ordering.
+- Consequences:
+  - Default user workflow aligns with monitoring and observability goals.
+  - Manual task commands remain available via command palette for advanced workflows.
+- Related:
+  - `extension/package.json`
+  - `extension/src/axis-sidebar-provider.mjs`
+  - `extension/src/initialize-repository-command.mjs`
+  - `extension/README.md`
+  - `tests/extension/monitor-first-command-surface.test.mjs`
+
+## ADR-0052: Add End-to-End Integration Coverage for Enforcement Lifecycle
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 behavior spans MCP initialization, diff validation, acknowledgment, rollback, and CI strict checks.
+  - Unit tests alone do not confirm lifecycle behavior across these components.
+- Decision:
+  - Add integration test harness `tests/integration/axis-enforcement-lifecycle.test.mjs` covering:
+    - initialize workspace command path
+    - edit drift detection in warn/enforce modes
+    - acknowledgment flow and expiry effect
+    - rollback flow for unlinked staged changes
+    - CI-style strict diff evaluation using commit range
+- Consequences:
+  - Enforcement flow regressions are detected in one consolidated lifecycle test.
+  - Task-level acceptance for Phase 17 can rely on concrete end-to-end evidence.
+- Related:
+  - `tests/integration/axis-enforcement-lifecycle.test.mjs`
+  - `scripts/axis-validate-diff.mjs`
+  - `scripts/axis-acknowledgment-lib.mjs`
+  - `scripts/axis-rollback-unlinked.mjs`
+  - `server/mcp/src/mcp-service.mjs`
+
+## ADR-0053: Document Monitor-First Setup and Enforcement Remediation Runbook
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Phase 17 requires explicit operator documentation for initialization-first setup and enforcement remediation steps.
+  - Architecture/spec docs need clear cross-references for new enforcement surfaces.
+- Decision:
+  - Update extension install guide with monitor-first setup and enforcement command flow.
+  - Add dedicated enforcement runbook for warning, acknowledgment, rollback, CI gate, and audit log operations.
+  - Add architecture/spec references for initialization and drift enforcement artifacts.
+- Consequences:
+  - Setup and remediation path is documented end-to-end.
+  - Future contributors can trace enforcement behavior from spec/architecture to operational runbooks.
+- Related:
+  - `docs/EXTENSION-INSTALL.md`
+  - `docs/ENFORCEMENT-RUNBOOK.md`
+  - `docs/ARCHITECTURE.md`
+  - `docs/SPEC-v0.md`
+  - `tests/scripts/phase-17-doc-links.test.mjs`
+
+## ADR-0054: Remove Manual Task Commands from Extension Surface for MCP-Driven Monitor-Only Workflow
+- Date: 2026-03-01
+- Status: accepted
+- Context:
+  - Product workflow is MCP-driven and monitor-only for end users.
+  - Manual task commands in extension surface (`startTask`, `confirmTask`, `showTaskState`) conflict with this model.
+- Decision:
+  - Remove manual task command contributions and activation events from extension manifest.
+  - Remove manual task command IDs/handlers from extension command registry and workflow controller.
+  - Keep only monitor/init user commands:
+    - `axis.initializeRepository`
+    - `axis.checkConnection`
+    - `axis.openGraphExplorer`
+  - Remove legacy task command shortcuts from sidebar and related docs/tests.
+- Consequences:
+  - Extension UI now aligns with monitor-only workflow.
+  - Legacy task command code paths are deleted rather than hidden.
+- Related:
+  - `extension/package.json`
+  - `extension/src/extension.mjs`
+  - `extension/src/workflow-controller.mjs`
+  - `extension/src/axis-sidebar-provider.mjs`
+  - `docs/EXTENSION-INSTALL.md`

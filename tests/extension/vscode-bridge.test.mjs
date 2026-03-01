@@ -24,8 +24,8 @@ function createMockVsCode() {
 
 test("registerVsCodeCommands wires all registry commands", async () => {
   const registry = new CommandRegistry();
-  registry.register("axis.startTask", async () => ({ ok: true }));
-  registry.register("axis.showTaskState", async () => ({ ok: true }));
+  registry.register("axis.commandA", async () => ({ ok: true }));
+  registry.register("axis.commandB", async () => ({ ok: true }));
 
   const mockVsCode = createMockVsCode();
   const context = { subscriptions: [] };
@@ -43,17 +43,17 @@ test("registerVsCodeCommands wires all registry commands", async () => {
 
 test("registerVsCodeCommands supports skipping specific commands", () => {
   const registry = new CommandRegistry();
-  registry.register("axis.startTask", async () => ({ ok: true }));
-  registry.register("axis.openGraphExplorer", async () => ({ ok: true }));
+  registry.register("axis.commandA", async () => ({ ok: true }));
+  registry.register("axis.commandB", async () => ({ ok: true }));
 
   const mockVsCode = createMockVsCode();
   const context = { subscriptions: [] };
   const logger = createSimpleLogger({ sink: { info: () => {}, log: () => {} } });
 
   const result = registerVsCodeCommands(mockVsCode, context, registry, logger, {
-    skipCommandIds: ["axis.openGraphExplorer"]
+    skipCommandIds: ["axis.commandB"]
   });
 
   assert.equal(result.count, 1);
-  assert.deepEqual(result.commandIds, ["axis.startTask"]);
+  assert.deepEqual(result.commandIds, ["axis.commandA"]);
 });

@@ -1,3 +1,5 @@
+import { mapEnforcementCodeToGuidance } from "../../shared/observability/src/index.mjs";
+
 export function buildConflictMessage(error) {
   const code = error?.code ?? "UNKNOWN";
 
@@ -23,6 +25,11 @@ export function buildConflictMessage(error) {
 
   if (code === "TRANSPORT_HTTP_ERROR") {
     return "Axis MCP server returned an HTTP error. Check server logs and retry.";
+  }
+
+  const enforcementGuidance = mapEnforcementCodeToGuidance(code);
+  if (enforcementGuidance?.message && code !== "UNKNOWN") {
+    return enforcementGuidance.message;
   }
 
   return "Command failed. Check logs and retry.";

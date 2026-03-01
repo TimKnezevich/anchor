@@ -28,6 +28,10 @@
   CODE_UNIT linkage defaults to module-level granularity.
 - `req.vscode.graph_explorer`
   VS Code extension provides a visual graph explorer to inspect node status and relations.
+- `req.workspace.initialize`
+  Axis supports explicit workspace initialization that records bootstrap status and required artifact paths.
+- `req.drift.enforcement`
+  Axis supports deterministic diff enforcement with warning, acknowledgment, rollback, and CI gate integration.
 
 ### con
 - `con.single_writer.repo`
@@ -42,6 +46,8 @@
   Vector layer cannot mutate authoritative graph state.
 - `con.events.derived`
   Event layer is derived from authoritative state and delivered at least once in monotonic repo_seq order.
+- `con.enforcement.error_codes`
+  Drift enforcement uses deterministic error codes and shared guidance mappings across CLI and extension surfaces.
 
 ### acc
 - `acc.stale_detection`

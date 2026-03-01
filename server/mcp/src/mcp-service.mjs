@@ -7,6 +7,14 @@ import { SpecService } from "../../spec/src/index.mjs";
 import { InMemoryStore } from "./in-memory-store.mjs";
 import { validateCommandEnvelope } from "./request-validator.mjs";
 
+const workspaceInitializationArtifacts = Object.freeze([
+  ".axis/",
+  ".axis/policy.json",
+  ".axis/evidence/",
+  ".axis/acknowledgments/",
+  "axis.json"
+]);
+
 function assertString(value, fieldName) {
   if (typeof value !== "string" || value.trim() === "") {
     throw new AxisError(`Field '${fieldName}' must be a non-empty string.`, {
@@ -73,7 +81,8 @@ export class AxisMcpService {
       attach_evidence: (request) => this.handleAttachEvidence(request),
       validate_task: (request) => this.handleValidateTask(request),
       upsert_clause: (request) => this.handleUpsertClause(request),
-      link_task_clause: (request) => this.handleLinkTaskClause(request)
+      link_task_clause: (request) => this.handleLinkTaskClause(request),
+      initialize_workspace: (request) => this.handleInitializeWorkspace(request)
     };
 
     if (!(command in handlers)) {
@@ -316,6 +325,50 @@ export class AxisMcpService {
 
     return {
       link
+    };
+  }
+
+  handleInitializeWorkspace(request) {
+    this.invariants.acquireRepoWriterLock(request.repo_id, request.actor);
+
+    const payload = request.payload ?? {};
+    const allowedFields = new Set(["schema_version"]);
+    for (const fieldName of Object.keys(payload)) {
+      if (!allowedFields.has(fieldName)) {
+        throw new AxisError(`Field '${fieldName}' is not allowed for initialize_workspace.`, {
+          code: errorCodes.VALIDATION_ERROR,
+          details: { field: fieldName }
+        });
+      }
+    }
+
+    const schemaVersion = payload.schema_version ?? "1";
+    assertString(schemaVersion, "schema_version");
+
+    const existing = this.store.getRepoInitialization(request.repo_id);
+    if (existing) {
+      return {
+        repo_id: request.repo_id,
+        created: false,
+        initialization: existing
+      };
+    }
+
+    const initialization = {
+      status: "initialized",
+      initialized: true,
+      schema_version: schemaVersion,
+      initialized_at: new Date().toISOString(),
+      initialized_by: request.actor,
+      artifact_paths: [...workspaceInitializationArtifacts]
+    };
+
+    this.store.upsertRepoInitialization(request.repo_id, initialization);
+
+    return {
+      repo_id: request.repo_id,
+      created: true,
+      initialization
     };
   }
 

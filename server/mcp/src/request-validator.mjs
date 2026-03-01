@@ -6,7 +6,8 @@ const allowedCommands = new Set([
   "attach_evidence",
   "validate_task",
   "upsert_clause",
-  "link_task_clause"
+  "link_task_clause",
+  "initialize_workspace"
 ]);
 
 function isObject(value) {

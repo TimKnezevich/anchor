@@ -16,10 +16,7 @@ test("extension activation registers expected commands", () => {
   const commandList = extension.registry.list();
 
   assert.deepEqual(commandList.sort(), [
-    commandIds.CHECK_CONNECTION,
-    commandIds.CONFIRM_TASK,
-    commandIds.OPEN_GRAPH_EXPLORER,
-    commandIds.SHOW_TASK_STATE,
-    commandIds.START_TASK
+    commandIds.INITIALIZE_REPOSITORY,
+    commandIds.CHECK_CONNECTION
   ].sort());
 });

@@ -5,6 +5,7 @@ export class InMemoryStore {
     this.sessions = new Map();
     this.evidenceByTask = new Map();
     this.validationByTask = new Map();
+    this.repoInitialization = new Map();
   }
 
   getNode(nodeId) {
@@ -60,5 +61,14 @@ export class InMemoryStore {
 
   getValidation(taskId) {
     return this.validationByTask.get(taskId) ?? null;
+  }
+
+  getRepoInitialization(repoId) {
+    return this.repoInitialization.get(repoId) ?? null;
+  }
+
+  upsertRepoInitialization(repoId, initialization) {
+    this.repoInitialization.set(repoId, initialization);
+    return initialization;
   }
 }

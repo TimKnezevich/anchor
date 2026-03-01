@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { createLogger } from "../shared/observability/src/index.mjs";
+import { ensureIconAssets } from "./ensure-icon-assets.mjs";
 
 const logger = createLogger({ service: "axis-release-dry-run" });
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -47,6 +48,7 @@ function runCommand(command, args) {
 
 function main() {
   const validateOnly = process.argv.includes("--validate-only");
+  ensureIconAssets({ rootDir: root });
   verifyRequiredFiles();
 
   if (validateOnly) {

@@ -27,3 +27,4 @@ Files:
 - `phase-14-graph-webview-ui.md`
 - `phase-15-runtime-ops.md`
 - `phase-16-publish-and-release-automation.md`
+- `phase-17-ai-enforcement-and-init.md`

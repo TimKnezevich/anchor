@@ -106,3 +106,64 @@ test("http server handles mcp command request", async (t) => {
     await server.stop();
   }
 });
+
+test("http server serves graph explorer html page", async (t) => {
+  const service = new AxisMcpService();
+  const server = createMcpHttpServer({
+    service,
+    logger: createSilentLogger(),
+    host: "127.0.0.1",
+    port: 4325
+  });
+
+  try {
+    await server.start();
+  } catch (error) {
+    if (error?.code === "EPERM") {
+      t.skip("Socket binding is not allowed in this runtime.");
+      return;
+    }
+    throw error;
+  }
+
+  try {
+    const response = await fetch("http://127.0.0.1:4325/graph-explorer");
+    const html = await response.text();
+
+    assert.equal(response.status, 200);
+    assert.ok(html.includes("Axis Graph Explorer"));
+    assert.ok(html.includes("Refresh Graph"));
+  } finally {
+    await server.stop();
+  }
+});
+
+test("http server serves graph explorer html page with query params", async (t) => {
+  const service = new AxisMcpService();
+  const server = createMcpHttpServer({
+    service,
+    logger: createSilentLogger(),
+    host: "127.0.0.1",
+    port: 4326
+  });
+
+  try {
+    await server.start();
+  } catch (error) {
+    if (error?.code === "EPERM") {
+      t.skip("Socket binding is not allowed in this runtime.");
+      return;
+    }
+    throw error;
+  }
+
+  try {
+    const response = await fetch("http://127.0.0.1:4326/graph-explorer?repo_id=repo-1");
+    const html = await response.text();
+
+    assert.equal(response.status, 200);
+    assert.ok(html.includes("Axis Graph Explorer"));
+  } finally {
+    await server.stop();
+  }
+});

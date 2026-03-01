@@ -17,9 +17,7 @@
   ],
   "icon": "media/icon-128.png",
   "activationEvents": [
-    "onCommand:axis.startTask",
-    "onCommand:axis.confirmTask",
-    "onCommand:axis.showTaskState",
+    "onCommand:axis.initializeRepository",
     "onCommand:axis.openGraphExplorer",
     "onCommand:axis.checkConnection"
   ],
@@ -33,26 +31,35 @@
     "package.json"
   ],
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "axisSidebar",
+          "title": "Axis",
+          "icon": "media/icon-32.png"
+        }
+      ]
+    },
+    "views": {
+      "axisSidebar": [
+        {
+          "id": "axisControl",
+          "name": "Workspace"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "axis.startTask",
-        "title": "Axis: Start Task"
-      },
-      {
-        "command": "axis.confirmTask",
-        "title": "Axis: Confirm Task"
-      },
-      {
-        "command": "axis.showTaskState",
-        "title": "Axis: Show Task State"
-      },
-      {
-        "command": "axis.openGraphExplorer",
-        "title": "Axis: Open Graph Explorer"
+        "command": "axis.initializeRepository",
+        "title": "Axis: Initialize Repository"
       },
       {
         "command": "axis.checkConnection",
         "title": "Axis: Check Connection"
+      },
+      {
+        "command": "axis.openGraphExplorer",
+        "title": "Axis: Open Graph Explorer"
       }
     ]
   },

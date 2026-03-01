@@ -12,11 +12,9 @@ test("extension manifest declares required commands", () => {
 
   const commands = manifest.contributes.commands.map((item) => item.command).sort();
   assert.deepEqual(commands, [
+    "axis.initializeRepository",
     "axis.checkConnection",
-    "axis.confirmTask",
-    "axis.openGraphExplorer",
-    "axis.showTaskState",
-    "axis.startTask"
+    "axis.openGraphExplorer"
   ].sort());
 });
 
@@ -25,6 +23,6 @@ test("extension manifest main and activation events are configured", () => {
 
   assert.equal(manifest.main, "./src/vscode-extension.js");
   assert.ok(Array.isArray(manifest.activationEvents));
-  assert.ok(manifest.activationEvents.includes("onCommand:axis.startTask"));
+  assert.ok(manifest.activationEvents.includes("onCommand:axis.initializeRepository"));
   assert.ok(manifest.activationEvents.includes("onCommand:axis.openGraphExplorer"));
 });

@@ -64,6 +64,10 @@ export class AxisMcpClient {
     return this.send("validate_task", payload, commandId, context);
   }
 
+  initializeWorkspace(payload, commandId, context = {}) {
+    return this.send("initialize_workspace", payload, commandId, context);
+  }
+
   async checkConnection(context = {}) {
     if (typeof this.transport.healthCheck === "function") {
       const response = await this.transport.healthCheck(context.correlationId ?? null);
