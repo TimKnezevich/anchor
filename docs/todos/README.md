@@ -22,3 +22,8 @@ Files:
 - `phase-09-graph-explorer.md`
 - `phase-10-validation-and-release-hardening.md`
 - `phase-11-optional-feature-flags.md`
+- `phase-12-extension-packaging-and-install.md`
+- `phase-13-live-mcp-transport.md`
+- `phase-14-graph-webview-ui.md`
+- `phase-15-runtime-ops.md`
+- `phase-16-publish-and-release-automation.md`

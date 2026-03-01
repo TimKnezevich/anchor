@@ -1,0 +1,21 @@
+{
+  "name": "axis",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "typecheck": "node ./scripts/typecheck.mjs",
+    "lint": "node ./scripts/lint.mjs",
+    "db:migrate": "node ./scripts/db-migrate.mjs",
+    "db:seed": "node ./scripts/db-seed.mjs",
+    "extension:package": "node ./scripts/package-extension.mjs",
+    "icons:generate": "node ./scripts/generate-icon-set.mjs",
+    "changelog:update": "node ./scripts/update-changelog.mjs",
+    "release:sign": "node ./scripts/sign-artifacts.mjs",
+    "release:dry-run": "node ./scripts/release-dry-run.mjs",
+    "runtime:start": "node ./scripts/run-mcp-server.mjs",
+    "runtime:start:local": "node ./scripts/run-mcp-server-local.mjs",
+    "runtime:start:shared": "node ./scripts/run-mcp-server-shared.mjs"
+  }
+}

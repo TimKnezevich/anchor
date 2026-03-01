@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Axis mark">
+  <rect x="0" y="0" width="1024" height="1024" fill="#efefef" />
+  <g fill="none" stroke="#0B1220" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 832 L512 192 L768 832 L352 544 L672 544" />
+  </g>
+  <g fill="#efefef" stroke="#0B1220" stroke-width="20">
+    <circle cx="256" cy="832" r="42" />
+    <circle cx="512" cy="192" r="42" />
+    <circle cx="768" cy="832" r="42" />
+    <circle cx="352" cy="544" r="42" />
+    <circle cx="672" cy="544" r="42" />
+  </g>
+</svg>

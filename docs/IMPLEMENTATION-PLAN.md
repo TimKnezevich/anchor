@@ -150,6 +150,64 @@ Deliverables:
 - proof that authoritative mutation path is unchanged
 - TODO tracker: `docs/todos/phase-11-optional-feature-flags.md`
 
+## Phase 12: Extension Packaging and Installability (Week 6+)
+1. Add VS Code extension manifest (`extension/package.json`) with command contributions.
+2. Add extension activation entrypoint that binds command handlers to VS Code APIs.
+3. Add packaging workflow for local `.vsix` build and install.
+4. Add smoke test steps for local install and command execution in VS Code.
+
+Deliverables:
+- installable `.vsix` package path documented
+- extension manifest + activation wiring
+- local install guide and smoke test checklist
+- TODO tracker: `docs/todos/phase-12-extension-packaging-and-install.md`
+
+## Phase 13: Live MCP Transport Integration (Week 7)
+1. Implement real extension transport to local Axis MCP server.
+2. Add connection config, health checks, and retry strategy.
+3. Replace placeholder transport in VS Code activation with live bridge.
+4. Add integration tests for real command execution path.
+
+Deliverables:
+- live extension-to-server command flow
+- transport config docs and troubleshooting guide
+- TODO tracker: `docs/todos/phase-13-live-mcp-transport.md`
+
+## Phase 14: Real Graph Explorer Webview UI (Week 7-8)
+1. Build VS Code webview panel for graph explorer models.
+2. Render nodes/edges visually with filters and detail pane.
+3. Add trace path UX and refresh/diff highlights.
+4. Add UI smoke tests for command-to-view behavior.
+
+Deliverables:
+- interactive graph webview in VS Code
+- graph UI usage guide and known limits
+- TODO tracker: `docs/todos/phase-14-graph-webview-ui.md`
+
+## Phase 15: Runtime Deployment and Operations (Week 8)
+1. Add server startup scripts and environment profiles.
+2. Define local process model (single user) and shared model (team usage).
+3. Add runtime health endpoints and structured operational logs.
+4. Add backup/restore strategy for storage.
+
+Deliverables:
+- runtime operations doc and startup profiles
+- deployment smoke checklist
+- TODO tracker: `docs/todos/phase-15-runtime-ops.md`
+
+## Phase 16: Publish and Release Automation (Week 8+)
+1. Add CI workflow for test/typecheck/lint/package.
+2. Add extension release workflow for signed versioned artifacts.
+3. Add changelog and versioning process for extension + server.
+4. Add post-release verification and rollback checklist.
+5. Create extension logo icon set from one source SVG and wire it into release assets.
+
+Deliverables:
+- CI release pipeline docs and scripts
+- publish checklist and rollback runbook
+- source SVG logo + exported icon set for extension/publishing surfaces
+- TODO tracker: `docs/todos/phase-16-publish-and-release-automation.md`
+
 ## Test Matrix (Must Pass Before v0 Release)
 1. Single writer lock is exclusive per repo.
 2. One active session per task enforced.

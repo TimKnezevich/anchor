@@ -13,15 +13,18 @@ This file tells coding agents how to work in this repo.
 - Canonical spec: `docs/SPEC-v0.md`
 - Architecture reference: `docs/ARCHITECTURE.md`
 - Build order: `docs/IMPLEMENTATION-PLAN.md`
-- Decision log: `docs/ADR.md`
+- Decision logs:
+  - Active: `docs/ADR-0021-plus.md`
+  - Historical: `docs/ADR.md` (ADR-0001 through ADR-0020)
 - Root summary: `README.md`
 
 If docs conflict, resolve in this order:
 1. `docs/SPEC-v0.md`
 2. `docs/ARCHITECTURE.md`
 3. `docs/IMPLEMENTATION-PLAN.md`
-4. `docs/ADR.md`
-5. `README.md`
+4. `docs/ADR-0021-plus.md`
+5. `docs/ADR.md`
+6. `README.md`
 
 ## Hard Rules
 1. Keep language plain and technical. Avoid marketing wording.
@@ -45,7 +48,7 @@ If docs conflict, resolve in this order:
    - node or relation changes -> update `NODE-MODEL.md` / `EDGE-MODEL.md` (when created)
    - invariant changes -> update `SPEC-v0.md`
    - workflow changes -> update `ARCHITECTURE.md`
-   - development decisions -> append entry to `docs/ADR.md`
+   - development decisions -> append entry to `docs/ADR-0021-plus.md`
 2. Prefer small, reviewable commits and patches.
 3. Add tests for:
    - lock behavior
@@ -69,7 +72,7 @@ If docs conflict, resolve in this order:
 8. Treat agent-written tests as part of the required test run for that task.
 
 ## ADR Requirement
-1. Any agent making a development decision must update `docs/ADR.md` in the same change.
+1. Any agent making a development decision must update `docs/ADR-0021-plus.md` in the same change.
 2. Interpret \"decision\" broadly:
    - schema choice
    - API shape
