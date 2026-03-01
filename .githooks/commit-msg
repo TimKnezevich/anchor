@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+message_file="${1:-}"
+if [ -z "$message_file" ]; then
+  echo "axis commit-msg: missing commit message file path."
+  exit 20
+fi
+
+node scripts/axis-validate-commit-msg.mjs "$message_file"

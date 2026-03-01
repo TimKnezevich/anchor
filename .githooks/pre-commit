@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+set +e
+node scripts/axis-validate-diff.mjs --staged-only
+status=$?
+set -e
+
+if [ "$status" -eq 10 ]; then
+  echo "axis pre-commit: warning mode detected unlinked files; commit allowed."
+  exit 0
+fi
+
+exit "$status"
