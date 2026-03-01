@@ -104,3 +104,23 @@ test("evaluateAxisDiff returns fail in enforce mode when changed files are unlin
   assert.equal(result.exit_code, 20);
   assert.ok(result.unlinked_files.includes("tracked.txt"));
 });
+
+test("evaluateAxisDiff returns pass when no changed files exist without requiring policy/evidence", () => {
+  const root = mkdtempSync(join(tmpdir(), "axis-diff-empty-"));
+  runGit(root, ["init"]);
+  runGit(root, ["config", "user.email", "axis@example.com"]);
+  runGit(root, ["config", "user.name", "Axis Test"]);
+  writeFileSync(join(root, "tracked.txt"), "base\n");
+  runGit(root, ["add", "tracked.txt"]);
+  runGit(root, ["commit", "-m", "base"]);
+
+  const result = evaluateAxisDiff({
+    cwd: root,
+    includeWorking: true,
+    includeStaged: true
+  });
+
+  assert.equal(result.status, "pass");
+  assert.equal(result.exit_code, 0);
+  assert.deepEqual(result.issues, []);
+});

@@ -250,6 +250,25 @@ export function evaluateAxisDiff(options = {}) {
     headRef: options.headRef
   });
 
+  if (changedFiles.length === 0) {
+    return {
+      status: "pass",
+      exit_code: exitCodes.pass,
+      policy_mode: null,
+      strict_mode: options.strict === true,
+      changed_files: [],
+      linked_files: [],
+      unlinked_files: [],
+      acknowledged_unlinked_files: [],
+      active_acknowledgments: 0,
+      expired_acknowledgments: 0,
+      enforcement_codes: [],
+      guidance: [],
+      evidence_context: null,
+      issues: []
+    };
+  }
+
   const policy = resolvePolicy(cwd, issues);
   const evidence = readEvidenceRecord(cwd, options.evidenceFile, issues);
   const acknowledgmentSet = collectActiveAcknowledgments(cwd, options.nowIso);
